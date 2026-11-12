@@ -1,0 +1,117 @@
+{% extends 'control/base.html' %}
+{% block titulo %}Reporte de {{ titulo|lower }}{% endblock %}
+{% block contenido %}
+<div class="cabecera no-imprimir">
+    <div>
+        <h1>Reporte de {{ titulo|lower }}</h1>
+        <p>Filtra los datos y luego imprímelos o guárdalos en PDF.</p>
+    </div>
+    <button class="btn" type="button" data-imprimir>Imprimir o guardar PDF</button>
+</div>
+
+<nav class="pestanas no-imprimir" aria-label="Tipo de reporte">
+    <a href="{% url 'reporte' 'citas' %}" class="{% if tipo == 'citas' %}activo{% endif %}">Citas</a>
+    <a href="{% url 'reporte' 'valoraciones' %}"
+        class="{% if tipo == 'valoraciones' %}activo{% endif %}">Valoraciones</a>
+    <a href="{% url 'reporte' 'pagos' %}" class="{% if tipo == 'pagos' %}activo{% endif %}">Pagos</a>
+</nav>
+
+<form class="filtros no-imprimir" method="get">
+    <label>Desde <input type="date" name="desde" value="{{ desde }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ hasta }}"></label>
+    {% if estados %}
+    <label>Estado
+        <select name="estado">
+            <option value="">Todos</option>
+            {% for valor, etiqueta in estados %}
+            <option value="{{ valor }}" {% if estado == valor %}selected{% endif %}>{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    {% endif %}
+    <button class="btn" type="submit">Filtrar</button>
+    <a class="btn btn-suave" href="{% url 'reporte' tipo %}">Limpiar</a>
+</form>
+
+<div class="solo-imprimir">
+    <h1>Green Harmony Spa · Reporte de {{ titulo|lower }}</h1>
+    <p>{% if desde %}Desde {{ desde }}. {% endif %}{% if hasta %}Hasta {{ hasta }}. {% endif %}{% if estado %}Estado: {{
+        estado }}.{% endif %} Emitido el {% now "j/m/Y H:i" %}.</p>
+</div>
+
+<div class="tabla-wrap">
+    {% if objetos %}
+    <table>
+        {% if tipo == 'citas' %}
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Terapeuta</th>
+                <th>Servicio</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>{% for c in objetos %}<tr>
+                <td>{{ c.fecha|date:"d/m/Y" }}</td>
+                <td>{{ c.hora|time:"H:i" }}</td>
+                <td>{{ c.cliente }}</td>
+                <td>{{ c.terapeuta }}</td>
+                <td>{{ c.servicio }}</td>
+                <td>{{ c.motivo }}</td>
+                <td><span class="v-{{ c.estado|slugify }}">{{ c.estado }}</span></td>
+            </tr>{% endfor %}</tbody>
+        {% elif tipo == 'valoraciones' %}
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Terapeuta</th>
+                <th>Tipo de piel</th>
+                <th>Valoración</th>
+                <th>Recomendaciones</th>
+            </tr>
+        </thead>
+        <tbody>{% for v in objetos %}<tr>
+                <td>{{ v.fecha|date:"d/m/Y" }}</td>
+                <td>{{ v.cita.cliente }}</td>
+                <td>{{ v.cita.terapeuta }}</td>
+                <td>{{ v.tipo_piel }}</td>
+                <td>{{ v.descripcion|truncatechars:90 }}</td>
+                <td>{{ v.recomendaciones|truncatechars:90 }}</td>
+            </tr>{% endfor %}</tbody>
+        {% else %}
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Servicio</th>
+                <th>Método</th>
+                <th>Monto</th>
+                <th>Descuento</th>
+                <th>Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>{% for p in objetos %}<tr>
+                <td>{{ p.fecha_pago|date:"d/m/Y" }}</td>
+                <td>{{ p.cita.cliente }}</td>
+                <td>{{ p.cita.servicio }}</td>
+                <td>{{ p.metodo_pago }}</td>
+                <td>S/ {{ p.monto }}</td>
+                <td>S/ {{ p.descuento }}</td>
+                <td>S/ {{ p.total }}</td>
+                <td><span class="v-{{ p.estado|slugify }}">{{ p.estado }}</span></td>
+            </tr>{% endfor %}</tbody>
+        {% endif %}
+    </table>
+    <p class="pie-tabla">{{ objetos|length }} {% if objetos|length == 1 %}registro{% else %}registros{% endif %} en este
+        reporte.</p>
+    {% if tipo == 'pagos' %}<p class="total">Total cobrado: S/ {{ total_pagado|floatformat:2 }}</p>{% endif %}
+    {% else %}
+    <p class="vacio">No hay datos con estos filtros. Amplía el rango de fechas o elige otro estado.</p>
+    {% endif %}
+</div>
+{% endblock %}

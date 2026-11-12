@@ -1,0 +1,51 @@
+{% extends 'control/base.html' %}
+{% block titulo %}{{ info.titulo }}{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+    <div>
+        <h1>{{ info.titulo }}</h1>
+        <p>{{ datos|length }} {% if datos|length == 1 %}registro{% else %}registros{% endif %}{% if q %} para “{{ q
+            }}”{% endif %}</p>
+    </div>
+    <div class="buscar">
+        <form class="buscar" method="get" role="search">
+            <label class="sr" for="q">Buscar en {{ info.titulo }}</label>
+            <input id="q" type="search" name="q" value="{{ q }}" placeholder="Buscar…" maxlength="100" class="buscar-input">
+            <button class="btn btn-suave" type="submit">Buscar</button>
+            {% if q %}<a class="btn btn-suave" href="{% url 'listado' seccion %}">Limpiar</a>{% endif %}
+        </form>
+        <a class="btn" href="{% url 'nuevo' seccion %}">Nuevo registro</a>
+    </div>
+</div>
+
+<div class="tabla-wrap">
+    {% if datos %}
+    <table>
+        <thead>
+            <tr>{% for c in cabeceras %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj, fila in datos %}
+            <tr>
+                {% for v in fila %}<td><span class="v-{{ v|stringformat:'s'|slugify }}">{{ v }}</span></td>{% endfor %}
+                <td class="acciones">
+                    <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                    {% if seccion == 'citas' or seccion == 'valoraciones' or seccion == 'pagos' %}
+                    <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                        data-confirmar="Se eliminará este registro de {{ info.titulo|lower }}. Esta acción no se puede deshacer.">
+                        {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="vacio">{% if q %}No encontramos resultados para “{{ q }}”. Prueba con otro nombre o documento.{% else
+        %}Todavía no hay registros. Usa “Nuevo registro” para agregar el primero.{% endif %}</p>
+    {% endif %}
+</div>
+{% endblock %}

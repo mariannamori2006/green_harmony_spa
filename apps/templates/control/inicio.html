@@ -1,0 +1,50 @@
+{% extends 'control/base.html' %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<section class="hero agua">
+    <div>
+        <h1>Hola, {{ request.user.username }}</h1>
+        <p>{% now "l, j \d\e F \d\e Y" %}</p>
+    </div>
+    <div class="lado">
+        <p class="cifra">S/ {{ ingresos|floatformat:2 }}</p>
+        <div class="etiqueta">cobrado en pagos registrados como pagados</div>
+        <div class="aparte"><strong>{{ pendientes }}</strong> {% if pendientes == 1 %}cita por atender{% else %}citas
+            por atender{% endif %}</div>
+    </div>
+</section>
+
+<div class="dos">
+    <section class="panel">
+        <div class="cabecera" style="margin-bottom:0">
+            <h2>Próximas citas</h2>
+            <a class="btn btn-suave btn-mini" href="{% url 'nuevo' 'citas' %}">Agendar cita</a>
+        </div>
+        {% if proximas %}
+        <ul class="lista">
+            {% for c in proximas %}
+            <li>
+                <div class="fecha-cita"><b>{{ c.fecha|date:"j" }}</b><span>{{ c.fecha|date:"M" }}</span></div>
+                <div class="info-cita">
+                    <strong>{{ c.hora|time:"H:i" }} · {{ c.cliente }}</strong>
+                    <span>{{ c.servicio }} con {{ c.terapeuta }}</span>
+                </div>
+                <span class="v-{{ c.estado|slugify }}">{{ c.estado }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="vacio">No hay citas próximas. Agenda la primera para verla aquí.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Registros del sistema</h2>
+        <div class="registros" style="margin-top:.6rem">
+            {% for titulo, total, nombre in resumen %}
+            <a href="{% url 'listado' nombre %}"><span>{{ titulo }}</span><b>{{ total }}</b></a>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'control/base.html' %}
+{% block titulo %}{% if objeto %}Editar{% else %}Nuevo{% endif %} · {{ info.titulo }}{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+    <div>
+        <h1>{% if objeto %}Editar registro{% else %}Nuevo registro{% endif %}</h1>
+        <p>{{ info.titulo }}</p>
+    </div>
+</div>
+<form class="panel formulario-panel" method="post" novalidate>
+    {% csrf_token %}
+    {% if formulario.non_field_errors %}<div class="errores" role="alert">{% for e in formulario.non_field_errors %}
+        <div>{{ e }}</div>{% endfor %}</div>{% endif %}
+    <div class="rejilla">
+        {% for campo in formulario %}
+        <div class="campo-bloque {% if campo.widget_type == 'textarea' %}ancho{% endif %}">
+            <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+            {{ campo }}
+            {% if campo.help_text %}<span class="ayuda">{{ campo.help_text }}</span>{% endif %}
+            {% for e in campo.errors %}<p class="error">{{ e }}</p>{% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="acciones-form">
+        <button class="btn" type="submit">{% if objeto %}Guardar cambios{% else %}Guardar registro{% endif %}</button>
+        <a class="btn btn-suave" href="{% url 'listado' seccion %}">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

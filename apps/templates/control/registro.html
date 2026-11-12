@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crear cuenta · Green Harmony Spa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600&family=Marcellus&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'control/img/logo.ico' %}">
+    <link rel="stylesheet" href="{% static 'control/css/styles.css' %}">
+</head>
+
+<body>
+    <div class="acceso">
+        <section class="acceso-lado agua">
+            <span class="marca"><svg viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M5 27C5 14 13 6 28 4c0 14-8 22-21 23z" fill="currentColor" />
+                    <path d="M6 26c6-7 11-12 17-17" stroke="#26473F" stroke-width="1.6" fill="none"
+                        stroke-linecap="round" />
+                </svg><span><strong>Green Harmony</strong><small>Spa y bienestar</small></span></span>
+            <div>
+                <h2>Crea tu cuenta para entrar al sistema.</h2>
+                <p>Tu cuenta tendrá acceso al trabajo diario. Los permisos de administración los asigna el responsable
+                    del spa.</p>
+            </div>
+            <small style="color:#9DBBAC">Acceso solo para el personal del spa</small>
+        </section>
+        <section class="acceso-form">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div>
+                    <h1>Crear cuenta</h1>
+                </div>
+                {% if formulario.non_field_errors %}<div class="errores" role="alert">{{ formulario.non_field_errors }}
+                </div>{% endif %}
+                {% for campo in formulario %}
+                <div class="campo-bloque">
+                    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                    {{ campo }}
+                    {% if campo.help_text %}<div class="ayuda">{{ campo.help_text|safe }}</div>{% endif %}
+                    {% for e in campo.errors %}<p class="error">{{ e }}</p>{% endfor %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-bloque" type="submit">Crear cuenta</button>
+                <p class="pie-form">¿Ya tienes cuenta? <a href="{% url 'login' %}">Ingresar</a></p>
+            </form>
+        </section>
+    </div>
+    <script src="{% static 'control/js/app.js' %}" defer></script>
+</body>
+
+</html>

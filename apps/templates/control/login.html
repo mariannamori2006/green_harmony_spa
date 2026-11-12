@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ingresar · Green Harmony Spa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600&family=Marcellus&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'control/img/logo.ico' %}">
+    <link rel="stylesheet" href="{% static 'control/css/styles.css' %}">
+</head>
+
+<body>
+    <div class="acceso">
+        <section class="acceso-lado agua">
+            <span class="marca"><svg viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M5 27C5 14 13 6 28 4c0 14-8 22-21 23z" fill="currentColor" />
+                    <path d="M6 26c6-7 11-12 17-17" stroke="#26473F" stroke-width="1.6" fill="none"
+                        stroke-linecap="round" />
+                </svg><span><strong>Green Harmony</strong><small>Spa y bienestar</small></span></span>
+            <div>
+                <h2>Cada cita, cada cliente y cada pago en un solo lugar.</h2>
+                <p>Organiza la agenda del spa y dedica tu tiempo a quien llega a descansar.</p>
+            </div>
+            <small style="color:#9DBBAC">Acceso solo para el personal del spa</small>
+        </section>
+        <section class="acceso-form">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div>
+                    <h1>Ingresa a tu cuenta</h1>
+                </div>
+                {% if formulario.errors %}<div class="errores" role="alert">Usuario o contraseña incorrectos. Revisa los
+                    datos e intenta de nuevo.</div>{% endif %}
+                <div class="campo-bloque">
+                    <label for="id_username">Usuario</label>
+                    <input type="text" name="username" id="id_username"
+                        value="{{ formulario.username.value|default:'' }}" autocomplete="username" autofocus required>
+                </div>
+                <div class="campo-bloque">
+                    <label for="id_password">Contraseña</label>
+                    <div class="clave">
+                        <input type="password" name="password" id="id_password" autocomplete="current-password"
+                            required>
+                        <button type="button" data-ver-clave>Mostrar</button>
+                    </div>
+                </div>
+                <label class="recordar"><input type="checkbox" name="recordarme" value="1"> Mantener mi cuenta
+                    abierta</label>
+                <button class="btn btn-bloque" type="submit">Ingresar</button>
+                {% if registro_abierto %}<p class="pie-form">¿Aún no tienes cuenta? <a href="{% url 'registro' %}">Crear
+                        una cuenta</a></p>{% endif %}
+            </form>
+        </section>
+    </div>
+    <script src="{% static 'control/js/app.js' %}" defer></script>
+</body>
+
+</html>

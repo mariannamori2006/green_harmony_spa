@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if seccion == 'citas' %}Cita{% elif seccion == 'valoraciones' %}Valoración{% else %}Pago{% endif %} N.º {{
+        objeto.pk }} · Green Harmony Spa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600&family=Marcellus&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'control/img/logo.ico' %}">
+    <link rel="stylesheet" href="{% static 'control/css/styles.css' %}">
+</head>
+
+<body>
+    <div class="documento-fondo">
+        <div class="barra-doc no-imprimir">
+            <button class="btn" type="button" data-imprimir>Imprimir o guardar PDF</button>
+            <a class="btn btn-suave" href="{% url 'listado' seccion %}">Volver al listado</a>
+        </div>
+        <article class="documento">
+            <header class="doc-cab">
+                <span class="marca"><svg viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M5 27C5 14 13 6 28 4c0 14-8 22-21 23z" fill="currentColor" />
+                        <path d="M6 26c6-7 11-12 17-17" stroke="#26473F" stroke-width="1.6" fill="none"
+                            stroke-linecap="round" />
+                    </svg><span><strong>Green Harmony</strong><small>Spa y bienestar</small></span></span>
+                <div style="text-align:right">
+                    <h2>{% if seccion == 'citas' %}Comprobante de cita{% elif seccion == 'valoraciones' %}Ficha de
+                        valoración{% else %}Comprobante de pago{% endif %}</h2>
+                    <span style="color:var(--suave)">N.º {{ objeto.pk|stringformat:"06d" }}</span>
+                </div>
+            </header>
+
+            <dl class="datos">
+                {% if seccion == 'citas' %}
+                <dt>Cliente</dt>
+                <dd>{{ objeto.cliente }} (DNI {{ objeto.cliente.dni }})</dd>
+                <dt>Servicio</dt>
+                <dd>{{ objeto.servicio }} · {{ objeto.servicio.duracion_minutos }} min</dd>
+                <dt>Terapeuta</dt>
+                <dd>{{ objeto.terapeuta }}</dd>
+                <dt>Fecha y hora</dt>
+                <dd>{{ objeto.fecha|date:"l j \d\e F \d\e Y" }}, {{ objeto.hora|time:"H:i" }}</dd>
+                <dt>Motivo</dt>
+                <dd>{{ objeto.motivo }}</dd>
+                <dt>Estado</dt>
+                <dd>{{ objeto.estado }}</dd>
+                <dt>Precio</dt>
+                <dd>S/ {{ objeto.servicio.precio }}</dd>
+                {% if objeto.observaciones %}<dt>Observaciones</dt>
+                <dd>{{ objeto.observaciones }}</dd>{% endif %}
+                {% elif seccion == 'valoraciones' %}
+                <dt>Cliente</dt>
+                <dd>{{ objeto.cita.cliente }} (DNI {{ objeto.cita.cliente.dni }})</dd>
+                <dt>Terapeuta</dt>
+                <dd>{{ objeto.cita.terapeuta }}</dd>
+                <dt>Servicio</dt>
+                <dd>{{ objeto.cita.servicio }}</dd>
+                <dt>Fecha</dt>
+                <dd>{{ objeto.fecha|date:"j \d\e F \d\e Y" }}</dd>
+                <dt>Tipo de piel</dt>
+                <dd>{{ objeto.tipo_piel }}</dd>
+                <dt>Valoración</dt>
+                <dd>{{ objeto.descripcion }}</dd>
+                <dt>Recomendaciones</dt>
+                <dd>{{ objeto.recomendaciones }}</dd>
+                {% else %}
+                <dt>Cliente</dt>
+                <dd>{{ objeto.cita.cliente }} (DNI {{ objeto.cita.cliente.dni }})</dd>
+                <dt>Servicio</dt>
+                <dd>{{ objeto.cita.servicio }}</dd>
+                <dt>Fecha de pago</dt>
+                <dd>{{ objeto.fecha_pago|date:"j \d\e F \d\e Y" }}</dd>
+                <dt>Método</dt>
+                <dd>{{ objeto.metodo_pago }}</dd>
+                <dt>Monto</dt>
+                <dd>S/ {{ objeto.monto }}</dd>
+                <dt>Descuento</dt>
+                <dd>S/ {{ objeto.descuento }}</dd>
+                <dt>Total</dt>
+                <dd><strong>S/ {{ objeto.total }}</strong></dd>
+                <dt>Estado</dt>
+                <dd>{{ objeto.estado }}</dd>
+                {% endif %}
+            </dl>
+
+            <div class="firmas">
+                <div>Firma del cliente</div>
+                <div>Firma del spa</div>
+            </div>
+        </article>
+    </div>
+    <script src="{% static 'control/js/app.js' %}" defer></script>
+</body>
+
+</html>
