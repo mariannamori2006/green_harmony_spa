@@ -18,6 +18,40 @@
     </div>
 </div>
 
+{% if seccion == 'servicios' and datos %}
+<div class="rejilla-servicios">
+    {% for obj, fila in datos %}
+    <article class="card-servicio">
+        <div class="card-servicio-media">
+            {% if obj.imagen %}
+            <img src="{{ obj.imagen.url }}" alt="{{ obj.nombre }}" loading="lazy">
+            {% else %}
+            <div class="card-servicio-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                <span>Sin fotografía</span>
+            </div>
+            {% endif %}
+            <span class="v-{{ obj.estado|slugify }} card-badge">{{ obj.estado }}</span>
+        </div>
+        <div class="card-servicio-cuerpo">
+            <div class="card-servicio-precios">
+                <span class="card-precio">S/ {{ obj.precio }}</span>
+                <span class="card-duracion">{{ obj.duracion_minutos }} min</span>
+            </div>
+            <h3>{{ obj.nombre }}</h3>
+            {% if obj.descripcion %}<p>{{ obj.descripcion|truncatechars:95 }}</p>{% endif %}
+            <div class="card-acciones">
+                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                    data-confirmar="Se eliminará el servicio “{{ obj.nombre }}”. Esta acción no se puede deshacer.">
+                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
 <div class="tabla-wrap">
     {% if datos %}
     <table>
@@ -48,4 +82,5 @@
         %}Todavía no hay registros. Usa “Nuevo registro” para agregar el primero.{% endif %}</p>
     {% endif %}
 </div>
+{% endif %}
 {% endblock %}

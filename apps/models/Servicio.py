@@ -1,5 +1,4 @@
 from django.core.validators import MinValueValidator
-from django.forms.models import modelform_defines_fields
 from django.db import models
 
 class Servicio(models.Model):
@@ -11,6 +10,7 @@ class Servicio(models.Model):
     descripcion = models.TextField()
     duracion_minutos = models.PositiveIntegerField(validators=[MinValueValidator(1, 'La duración debe ser mayor a 0.')])
     precio = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0, 'El precio no puede ser negativo.')])
+    imagen = models.ImageField(upload_to='servicios/', blank=True, null=True, verbose_name='Fotografía del servicio')
     estado = models.CharField(max_length=20, choices=ESTADOS, default='Activo')
 
     class Meta:

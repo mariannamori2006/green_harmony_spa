@@ -141,7 +141,7 @@ def guardar(request, seccion, pk=None):
     info = SECCIONES.get(seccion)
     if info is None: raise Http404('Sección no disponible')
     objeto = get_object_or_404(info['modelo'], pk=pk) if pk else None
-    formulario = info['formulario'](request.POST or None, instance=objeto)
+    formulario = info['formulario'](request.POST or None, request.FILES or None, instance=objeto)
     if request.method == 'POST' and formulario.is_valid():
         try:
             formulario.save()

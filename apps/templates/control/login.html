@@ -1,4 +1,7 @@
 {% load static %}
+{% static 'control/img/spa-1.jpg' as spa1 %}
+{% static 'control/img/spa-2.jpg' as spa2 %}
+{% static 'control/img/spa-3.jpg' as spa3 %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -16,17 +19,25 @@
 
 <body>
     <div class="acceso">
-        <section class="acceso-lado agua">
-            <span class="marca"><svg viewBox="0 0 32 32" aria-hidden="true">
-                    <path d="M5 27C5 14 13 6 28 4c0 14-8 22-21 23z" fill="currentColor" />
-                    <path d="M6 26c6-7 11-12 17-17" stroke="#26473F" stroke-width="1.6" fill="none"
-                        stroke-linecap="round" />
-                </svg><span><strong>Green Harmony</strong><small>Spa y bienestar</small></span></span>
-            <div>
-                <h2>Cada cita, cada cliente y cada pago en un solo lugar.</h2>
-                <p>Organiza la agenda del spa y dedica tu tiempo a quien llega a descansar.</p>
+        <section class="acceso-lado">
+            <div class="slideshow" aria-hidden="true">
+                <div class="slide" style="background-image: url({{spa1}});"></div>
+                <div class="slide" style="background-image: url({{spa2}});"></div>
+                <div class="slide" style="background-image: url({{spa3}});"></div>
+                <div class="slide-overlay"></div>
             </div>
-            <small style="color:#9DBBAC">Acceso solo para el personal del spa</small>
+            <div class="acceso-contenido">
+                <span class="marca"><svg viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M5 27C5 14 13 6 28 4c0 14-8 22-21 23z" fill="currentColor" />
+                        <path d="M6 26c6-7 11-12 17-17" stroke="#26473F" stroke-width="1.6" fill="none"
+                            stroke-linecap="round" />
+                    </svg><span><strong>Green Harmony</strong><small>Spa y bienestar</small></span></span>
+                <div>
+                    <h2>Cada cita, cada cliente y cada pago en un solo lugar.</h2>
+                    <p>Organiza la agenda del spa y dedica tu tiempo a quien llega a descansar.</p>
+                </div>
+                <small class="acceso-pie">Acceso solo para el personal del spa</small>
+            </div>
         </section>
         <section class="acceso-form">
             <form method="post" novalidate>

@@ -7,7 +7,7 @@
         <p>{{ info.titulo }}</p>
     </div>
 </div>
-<form class="panel formulario-panel" method="post" novalidate>
+<form class="panel formulario-panel" method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {% if formulario.non_field_errors %}<div class="errores" role="alert">{% for e in formulario.non_field_errors %}
         <div>{{ e }}</div>{% endfor %}</div>{% endif %}

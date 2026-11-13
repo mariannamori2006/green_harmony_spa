@@ -38,7 +38,7 @@ class TerapeutaForm(FormularioBase):
 class ServicioForm(FormularioBase):
     class Meta:
         model = Servicio
-        fields = ['nombre', 'descripcion', 'duracion_minutos', 'precio', 'estado']
+        fields = ['nombre', 'descripcion', 'duracion_minutos', 'precio', 'estado', 'imagen']
         widgets = {'descripcion': forms.Textarea(attrs={'rows': 3})}
 
 
