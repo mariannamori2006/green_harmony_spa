@@ -4,8 +4,7 @@
 <div class="cabecera">
     <div>
         <h1>{{ info.titulo }}</h1>
-        <p>{{ datos|length }} {% if datos|length == 1 %}registro{% else %}registros{% endif %}{% if q %} para “{{ q
-            }}”{% endif %}</p>
+        <p>{{ datos|length }} {% if datos|length == 1 %}registro{% else %}registros{% endif %}{% if q %} para “{{ q }}”{% endif %}</p>
     </div>
     <div class="buscar">
         <form class="buscar" method="get" role="search">
@@ -14,73 +13,378 @@
             <button class="btn btn-suave" type="submit">Buscar</button>
             {% if q %}<a class="btn btn-suave" href="{% url 'listado' seccion %}">Limpiar</a>{% endif %}
         </form>
+
+        {% if datos %}
+        <div class="vista-selector" role="group" aria-label="Cambiar vista">
+            <button type="button" class="btn-vista activo" data-vista="tarjetas" title="Vista creativa en tarjetas">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                <span>Tarjetas</span>
+            </button>
+            <button type="button" class="btn-vista" data-vista="tabla" title="Vista clásica en tabla">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                <span>Tabla</span>
+            </button>
+        </div>
+        {% endif %}
+
         <a class="btn" href="{% url 'nuevo' seccion %}">Nuevo registro</a>
     </div>
 </div>
 
-{% if seccion == 'servicios' and datos %}
-<div class="rejilla-servicios">
-    {% for obj, fila in datos %}
-    <article class="card-servicio">
-        <div class="card-servicio-media">
-            {% if obj.imagen %}
-            <img src="{{ obj.imagen.url }}" alt="{{ obj.nombre }}" loading="lazy">
-            {% else %}
-            <div class="card-servicio-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                <span>Sin fotografía</span>
-            </div>
-            {% endif %}
-            <span class="v-{{ obj.estado|slugify }} card-badge">{{ obj.estado }}</span>
-        </div>
-        <div class="card-servicio-cuerpo">
-            <div class="card-servicio-precios">
-                <span class="card-precio">S/ {{ obj.precio }}</span>
-                <span class="card-duracion">{{ obj.duracion_minutos }} min</span>
-            </div>
-            <h3>{{ obj.nombre }}</h3>
-            {% if obj.descripcion %}<p>{{ obj.descripcion|truncatechars:95 }}</p>{% endif %}
-            <div class="card-acciones">
-                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
-                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
-                    data-confirmar="Se eliminará el servicio “{{ obj.nombre }}”. Esta acción no se puede deshacer.">
-                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </article>
-    {% endfor %}
-</div>
-{% else %}
-<div class="tabla-wrap">
+<div id="contenedor-listado" class="vista-modo-tarjetas">
     {% if datos %}
-    <table>
-        <thead>
-            <tr>{% for c in cabeceras %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for obj, fila in datos %}
-            <tr>
-                {% for v in fila %}<td><span class="v-{{ v|stringformat:'s'|slugify }}">{{ v }}</span></td>{% endfor %}
-                <td class="acciones">
-                    <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
-                    {% if seccion == 'citas' or seccion == 'valoraciones' or seccion == 'pagos' %}
-                    <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
-                    {% endif %}
-                    <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
-                        data-confirmar="Se eliminará este registro de {{ info.titulo|lower }}. Esta acción no se puede deshacer.">
-                        {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- VISTA DE TARJETAS CREATIVAS -->
+        <div class="seccion-tarjetas">
+            {% if seccion == 'valoraciones' %}
+                <div class="rejilla-cards rejilla-valoraciones">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-valoracion">
+                        <header class="card-cabeza">
+                            <div class="card-avatar">
+                                <span>{{ obj.cita.cliente.nombres|slice:":1" }}{{ obj.cita.cliente.apellidos|slice:":1" }}</span>
+                            </div>
+                            <div class="card-titulos">
+                                <h3>{{ obj.cita.cliente.nombres }} {{ obj.cita.cliente.apellidos }}</h3>
+                                <p class="card-sub">{{ obj.cita.servicio.nombre|default:"Servicio Spa" }} · Cita #{{ obj.cita_id }}</p>
+                            </div>
+                            <span class="card-fecha">{{ obj.fecha|date:"d M Y" }}</span>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <div class="card-tag-destacado tag-piel">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                                <span><strong>Tipo de piel:</strong> {{ obj.tipo_piel }}</span>
+                            </div>
+
+                            {% if obj.descripcion %}
+                            <div class="card-seccion-texto">
+                                <div class="card-seccion-rotulo">Diagnóstico estético</div>
+                                <p class="card-texto-diagnostico">{{ obj.descripcion }}</p>
+                            </div>
+                            {% endif %}
+
+                            {% if obj.recomendaciones %}
+                            <div class="card-seccion-texto box-recomendacion">
+                                <div class="card-seccion-rotulo">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                                    Recomendaciones del especialista
+                                </div>
+                                <p class="card-texto-rec">{{ obj.recomendaciones }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Ficha #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará esta valoración clínica. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'citas' %}
+                <div class="rejilla-cards rejilla-citas">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-cita">
+                        <header class="card-cabeza cita-cabeza">
+                            <div class="cita-fecha-bloque">
+                                <span class="cita-dia">{{ obj.fecha|date:"d" }}</span>
+                                <span class="cita-mes">{{ obj.fecha|date:"M"|upper }}</span>
+                            </div>
+                            <div class="card-titulos">
+                                <div class="cita-meta-fila">
+                                    <span class="cita-hora">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        {{ obj.hora|time:"H:i" }}
+                                    </span>
+                                    <span class="v-{{ obj.estado|slugify }}">{{ obj.estado }}</span>
+                                </div>
+                                <h3>{{ obj.cliente.nombres }} {{ obj.cliente.apellidos }}</h3>
+                                <p class="card-sub">{{ obj.servicio.nombre }} · {{ obj.servicio.duracion_minutos }} min · S/ {{ obj.servicio.precio }}</p>
+                            </div>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <div class="cita-detalle-fila">
+                                <span class="cita-etiqueta">Especialista:</span>
+                                <span class="cita-valor">{{ obj.terapeuta.nombres }} {{ obj.terapeuta.apellidos }}</span>
+                            </div>
+                            {% if obj.motivo %}
+                            <div class="cita-detalle-fila">
+                                <span class="cita-etiqueta">Motivo:</span>
+                                <span class="cita-valor cita-motivo">{{ obj.motivo }}</span>
+                            </div>
+                            {% endif %}
+                            {% if obj.observaciones %}
+                            <div class="cita-obs">
+                                <strong>Nota:</strong> {{ obj.observaciones|truncatechars:100 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Cita #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará la cita de {{ obj.cliente }}. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'pagos' %}
+                <div class="rejilla-cards rejilla-pagos">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-pago">
+                        <header class="card-cabeza">
+                            <div class="pago-icono-metodo">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            </div>
+                            <div class="card-titulos">
+                                <h3>{{ obj.cita.cliente }}</h3>
+                                <p class="card-sub">{{ obj.cita.servicio.nombre|default:"Servicio Spa" }} · Cita #{{ obj.cita_id }}</p>
+                            </div>
+                            <span class="v-{{ obj.estado|slugify }}">{{ obj.estado }}</span>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <div class="pago-monto-bloque">
+                                <span class="pago-etiqueta-total">Total abonado</span>
+                                <div class="pago-monto">S/ {{ obj.total }}</div>
+                                {% if obj.descuento and obj.descuento > 0 %}
+                                <div class="pago-descuento">Monto: S/ {{ obj.monto }} · Descuento: -S/ {{ obj.descuento }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="pago-datos-grid">
+                                <div>
+                                    <span class="dato-sub">Método</span>
+                                    <span class="badge-metodo">{{ obj.metodo_pago }}</span>
+                                </div>
+                                <div>
+                                    <span class="dato-sub">Fecha de pago</span>
+                                    <span class="dato-val">{{ obj.fecha_pago|date:"d/m/Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Recibo #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará este comprobante de pago. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'servicios' %}
+                <div class="rejilla-servicios">
+                    {% for obj, fila in datos %}
+                    <article class="card-servicio">
+                        <div class="card-servicio-media">
+                            {% if obj.imagen %}
+                            <img src="{{ obj.imagen.url }}" alt="{{ obj.nombre }}" loading="lazy">
+                            {% else %}
+                            <div class="card-servicio-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                                <span>Sin fotografía</span>
+                            </div>
+                            {% endif %}
+                            <span class="v-{{ obj.estado|slugify }} card-badge">{{ obj.estado }}</span>
+                        </div>
+                        <div class="card-servicio-cuerpo">
+                            <div class="card-servicio-precios">
+                                <span class="card-precio">S/ {{ obj.precio }}</span>
+                                <span class="card-duracion">{{ obj.duracion_minutos }} min</span>
+                            </div>
+                            <h3>{{ obj.nombre }}</h3>
+                            {% if obj.descripcion %}<p>{{ obj.descripcion|truncatechars:95 }}</p>{% endif %}
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará el servicio “{{ obj.nombre }}”. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'clientes' %}
+                <div class="rejilla-cards rejilla-personas">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-persona">
+                        <header class="card-cabeza">
+                            <div class="card-avatar avatar-cliente">
+                                <span>{{ obj.nombres|slice:":1" }}{{ obj.apellidos|slice:":1" }}</span>
+                            </div>
+                            <div class="card-titulos">
+                                <h3>{{ obj.nombres }} {{ obj.apellidos }}</h3>
+                                <p class="card-sub">DNI {{ obj.dni }}</p>
+                            </div>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <div class="persona-contacto-lista">
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    <span>{{ obj.telefono }}</span>
+                                </div>
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                    <span>{{ obj.correo }}</span>
+                                </div>
+                                {% if obj.direccion %}
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <span>{{ obj.direccion|truncatechars:36 }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Cliente #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará al cliente “{{ obj.nombres }} {{ obj.apellidos }}”. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'terapeutas' %}
+                <div class="rejilla-cards rejilla-personas">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-persona">
+                        <header class="card-cabeza">
+                            <div class="card-avatar avatar-terapeuta">
+                                <span>{{ obj.nombres|slice:":1" }}{{ obj.apellidos|slice:":1" }}</span>
+                            </div>
+                            <div class="card-titulos">
+                                <h3>{{ obj.nombres }} {{ obj.apellidos }}</h3>
+                                <p class="card-sub">{{ obj.especialidad.nombre }}</p>
+                            </div>
+                            <span class="v-{{ obj.estado|slugify }}">{{ obj.estado }}</span>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <div class="persona-contacto-lista">
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    <span>{{ obj.telefono }}</span>
+                                </div>
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                    <span>{{ obj.correo }}</span>
+                                </div>
+                                <div class="persona-item">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+                                    <span>DNI {{ obj.dni }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Terapeuta #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará al terapeuta “{{ obj.nombres }} {{ obj.apellidos }}”. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+
+            {% elif seccion == 'especialidades' %}
+                <div class="rejilla-cards rejilla-especialidades">
+                    {% for obj, fila in datos %}
+                    <article class="card-creativa card-especialidad">
+                        <header class="card-cabeza">
+                            <div class="especialidad-icono">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 0 0-7.07 17.07C7.5 21.64 12 22 12 22s4.5-.36 7.07-2.93A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/><path d="M8 10h8"/></svg>
+                            </div>
+                            <div class="card-titulos">
+                                <h3>{{ obj.nombre }}</h3>
+                            </div>
+                            <span class="v-{{ obj.estado|slugify }}">{{ obj.estado }}</span>
+                        </header>
+
+                        <div class="card-cuerpo">
+                            <p class="card-texto-diagnostico">{{ obj.descripcion|default:"Área de bienestar y tratamientos de belleza." }}</p>
+                        </div>
+
+                        <footer class="card-pie">
+                            <span class="card-id-tag">Especialidad #{{ obj.id }}</span>
+                            <div class="card-acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará la especialidad “{{ obj.nombre }}”. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- VISTA DE TABLA CLÁSICA -->
+        <div class="seccion-tabla">
+            <div class="tabla-wrap">
+                <table>
+                    <thead>
+                        <tr>{% for c in cabeceras %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col">Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for obj, fila in datos %}
+                        <tr>
+                            {% for v in fila %}<td><span class="v-{{ v|stringformat:'s'|slugify }}">{{ v }}</span></td>{% endfor %}
+                            <td class="acciones">
+                                <a class="btn btn-suave btn-mini" href="{% url 'editar' seccion obj.pk %}">Editar</a>
+                                {% if seccion == 'citas' or seccion == 'valoraciones' or seccion == 'pagos' %}
+                                <a class="btn btn-suave btn-mini" href="{% url 'imprimir' seccion obj.pk %}">Imprimir</a>
+                                {% endif %}
+                                <form method="post" action="{% url 'eliminar' seccion obj.pk %}"
+                                    data-confirmar="Se eliminará este registro de {{ info.titulo|lower }}. Esta acción no se puede deshacer.">
+                                    {% csrf_token %}<button class="btn btn-peligro btn-mini" type="submit">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% else %}
-    <p class="vacio">{% if q %}No encontramos resultados para “{{ q }}”. Prueba con otro nombre o documento.{% else
-        %}Todavía no hay registros. Usa “Nuevo registro” para agregar el primero.{% endif %}</p>
+        <p class="vacio">{% if q %}No encontramos resultados para “{{ q }}”. Prueba con otro nombre o documento.{% else %}Todavía no hay registros. Usa “Nuevo registro” para agregar el primero.{% endif %}</p>
     {% endif %}
 </div>
-{% endif %}
 {% endblock %}

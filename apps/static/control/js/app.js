@@ -50,4 +50,33 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.mensaje').forEach(function (m) {
         setTimeout(function () { m.remove(); }, 6000);
     });
+
+    // Selector de vista (Tarjetas vs Tabla) en listados
+    var contenedorListado = document.getElementById('contenedor-listado');
+    var botonesVista = document.querySelectorAll('[data-vista]');
+    if (contenedorListado && botonesVista.length) {
+        var vistaGuardada = localStorage.getItem('spa_vista_preferida') || 'tarjetas';
+        aplicarVista(vistaGuardada);
+
+        botonesVista.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var vista = btn.getAttribute('data-vista');
+                localStorage.setItem('spa_vista_preferida', vista);
+                aplicarVista(vista);
+            });
+        });
+
+        function aplicarVista(vista) {
+            if (vista === 'tabla') {
+                contenedorListado.classList.add('vista-modo-tabla');
+                contenedorListado.classList.remove('vista-modo-tarjetas');
+            } else {
+                contenedorListado.classList.add('vista-modo-tarjetas');
+                contenedorListado.classList.remove('vista-modo-tabla');
+            }
+            botonesVista.forEach(function (b) {
+                b.classList.toggle('activo', b.getAttribute('data-vista') === vista);
+            });
+        }
+    }
 });

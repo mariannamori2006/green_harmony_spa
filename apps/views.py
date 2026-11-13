@@ -54,8 +54,8 @@ ETIQUETAS = {
 RELACIONES = {
     'terapeutas': ['especialidad'],
     'citas': ['cliente', 'terapeuta', 'servicio'],
-    'valoraciones': ['cita__cliente'],
-    'pagos': ['cita__cliente'],
+    'valoraciones': ['cita__cliente', 'cita__servicio', 'cita__terapeuta'],
+    'pagos': ['cita__cliente', 'cita__servicio'],
 }
  
  

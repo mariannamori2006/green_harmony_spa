@@ -1,7 +1,7 @@
 {% extends 'control/base.html' %}
 {% block titulo %}Inicio{% endblock %}
 {% block contenido %}
-<section class="hero agua">
+<section class="hero">
     <div>
         <h1>Hola, {{ request.user.username }}</h1>
         <p>{% now "l, j \d\e F \d\e Y" %}</p>
