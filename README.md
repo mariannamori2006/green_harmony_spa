@@ -1,34 +1,41 @@
 # 🌿 Green Harmony Spa · Sistema de Gestión de Spa y Bienestar
 
-Sistema web integral desarrollado en **Django** para la administración, control de citas, valoraciones de clientes, catálogo de servicios y gestión de pagos en centros de estética, spas y salones de bienestar.
+Sistema web integral desarrollado en **Django** para la administración, control de citas, valoraciones estéticas de clientes, catálogo visual de servicios con fotografías y gestión financiera de cobros en centros de estética, spas y salones de bienestar.
 
 ---
 
 ## ✨ Características Principales
 
-* **📅 Control de Citas:** Programación, asignación de terapeutas, servicios y seguimiento de estados (*Pendiente, Confirmada, Atendida, Cancelada*).
-* **💆‍♀️ Valoraciones Clínicas:** Registro del tipo de piel, diagnóstico y recomendaciones personalizadas por cliente.
-* **💳 Gestión de Pagos:** Control de cobros, métodos de pago (Efectivo, Tarjeta, Transferencia, Yape/Plin), descuentos y estados (*Pagado, Anulado*).
-* **📋 Catálogo de Servicios y Especialidades:** Definición de tiempos de duración, precios y áreas de especialidad del personal.
-* **👥 Directorio de Personas:** Registro detallado de clientes y terapeutas.
-* **📊 Reportes Avanzados e Impresión:** Filtrado dinámico por rangos de fecha y estados con vista optimizada para imprimir o guardar en PDF.
-* **📱 Diseño 100% Responsivo:** Interfaz moderna y adaptable a computadoras, tablets y teléfonos móviles con barra de navegación lateral e iconos vectoriales.
-* **🔒 Seguridad y Roles:** Autenticación con protección CSRF, sesiones protegidas y opción de registro controlado mediante código de invitación.
+* **📸 Catálogo Visual de Servicios con Fotografías:** Carga dinámica de imágenes para cada tratamiento y servicio con almacenamiento multimedia administrado mediante **Pillow**.
+* **🎴 Diseño Creativo en Tarjetas (Visual Cards):** En lugar de aburridas tablas monótonas de hoja de cálculo, el sistema presenta la información mediante tarjetas visuales adaptadas a cada entidad:
+  * **💆‍♀️ Fichas de Diagnóstico Estético (Valoraciones):** Avatar con monograma de iniciales, etiqueta botánica de *Tipo de Piel*, cuadro de diagnóstico clínico y caja destacada de *Recomendaciones del especialista*.
+  * **📅 Agenda de Citas:** Tarjetas con bloque de calendario visual (día y mes), chip de hora (`09:30`), especialista asignado, servicio, precio y distintivo de estado.
+  * **💳 Recibos de Pagos:** Fichas de comprobante financiero con monto total destacado, desglose de descuentos, insignia de método de pago y fecha.
+  * **👥 Directorio de Clientes y Terapeutas:** Fichas de perfil con avatar degradado y accesos rápidos a teléfono, correo, DNI y dirección.
+  * **✨ Áreas y Especialidades:** Tarjetas de bienestar con íconos vectoriales y descripción.
+* **🔄 Selector de Vista Interactivo (🎴 Tarjetas / 📋 Tabla):** Conmutador en cabecera para alternar entre vista creativa de tarjetas y tabla tradicional compacta en un solo clic, con memoria automática en el navegador (`localStorage`).
+* **🌟 Panel de Inicio con Fotografía y Glassmorphism:** Banner hero con fotografía ambiental de spa, efecto de cristal esmerilado translúcido (*backdrop-filter*), cifras financieras destacadas y saludo dinámico.
+* **🧘‍♂️ Experiencia de Acceso con Ken Burns:** Pantallas de Inicio de Sesión y Registro con presentación fotográfica animada en movimiento continuo (*Ken Burns slideshow*).
+* **🔍 Buscador y Filtros en Fila:** Buscador horizontal con alineación uniforme y filtros dinámicos responsivos.
+* **📊 Reportes e Impresión:** Generación de informes filtrados por fechas y estados, optimizados con estilos de impresión limpia y exportación a PDF.
+* **📱 100% Responsivo:** Interfaz adaptable a pantallas de escritorio, tablets y móviles con menú lateral deslizable.
+* **🔒 Seguridad y Roles:** Protección CSRF, sesiones seguras, validaciones de integridad y registro controlado por código de invitación.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
 * **Backend:** Python 3.10+ / Django 6.x
+* **Procesamiento de Imágenes:** Pillow (Python Imaging Library)
 * **Base de datos:** MySQL / MariaDB (compatible con XAMPP)
-* **Frontend:** HTML5 semántico, CSS3 moderno (Grid, Flexbox, variables CSS) y JavaScript Vanilla (sin frameworks pesados).
-* **Archivos estáticos:** WhiteNoise
+* **Frontend:** HTML5 semántico, CSS3 moderno (CSS Grid, Flexbox, Glassmorphism, animaciones CSS) y JavaScript Vanilla (sin frameworks externos pesados).
+* **Archivos estáticos y multimedia:** WhiteNoise (estáticos) y Django FileSystemStorage (multimedia de usuario).
 
 ---
 
-## 🚀 Requisitos Previos
+## 📦 Requisitos Previos
 
-Asegúrate de contar con lo siguiente instalado en tu sistema:
+Asegúrate de contar con lo siguiente instalado en tu equipo:
 
 1. **Python 3.10 o superior** ([python.org](https://www.python.org/))
 2. **Servidor MySQL o MariaDB** (puedes usar el módulo MySQL de [XAMPP](https://www.apachefriends.org/))
@@ -36,7 +43,7 @@ Asegúrate de contar con lo siguiente instalado en tu sistema:
 
 ---
 
-## 📦 Instalación y Puesta en Marcha
+## 🚀 Instalación y Puesta en Marcha
 
 Sigue estos pasos para clonar y ejecutar el proyecto en tu entorno local:
 
@@ -98,8 +105,9 @@ CREATE DATABASE green_harmony_spa_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 ```
 
 ### 6. Ejecutar migraciones
-Aplica las tablas del sistema:
+Aplica las tablas del sistema (incluyendo el soporte de fotografías para servicios):
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -118,14 +126,22 @@ Abre tu navegador en: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ---
 
+## 🖼️ Manejo de Archivos Multimedia (Imágenes de Servicios)
+
+* Las imágenes cargadas por los usuarios se almacenan en la carpeta local `media/servicios/`.
+* Durante el modo de desarrollo (`DEBUG=True`), Django sirve automáticamente estos archivos a través de la ruta `/media/`.
+* Esta carpeta está protegida e ignorada en el archivo `.gitignore` para no subir archivos de prueba o datos privados al repositorio de Git.
+
+---
+
 ## 🌐 Pruebas remotas (Túnel con Cloudflare)
 
-Para probar la aplicación en tu teléfono móvil o permitir que otros clientes/colegas la prueben a distancia sin desplegar a producción:
+Para probar la aplicación en tu teléfono móvil o permitir que otros clientes o colegas la revisen a distancia sin necesidad de desplegar en producción:
 
 ```powershell
 cloudflared tunnel --url http://localhost:8000
 ```
-Copia la URL pública generada (`https://....trycloudflare.com`) y ábrela en cualquier navegador.
+Copia la URL pública generada (`https://....trycloudflare.com`) y ábrela en cualquier navegador móvil o de escritorio.
 
 ---
 
@@ -134,20 +150,24 @@ Copia la URL pública generada (`https://....trycloudflare.com`) y ábrela en cu
 ```text
 SalonSpa/
 ├── apps/                        # Aplicación principal de Django
-│   ├── models/                  # Modelos de datos (Citas, Clientes, Pagos, etc.)
-│   ├── templates/control/       # Plantillas HTML (base, inicio, reportes, etc.)
-│   ├── static/control/          # Estilos CSS, scripts JS, iconos e imágenes
-│   ├── views.py                 # Lógica de controladores y vistas
-│   ├── forms.py                 # Formularios de validación
+│   ├── models/                  # Modelos de datos (Citas, Clientes, Pagos, Servicios, etc.)
+│   ├── templates/control/       # Plantillas HTML (base, inicio, listados, formularios, login)
+│   ├── static/control/          # Recursos estáticos
+│   │   ├── css/styles.css       # Estilos CSS generales, tarjetas creativas y temas
+│   │   ├── js/app.js            # Lógica JS (selector de vistas, modales, alertas)
+│   │   └── img/                 # Logotipo, favicon e imágenes ambientales de spa
+│   ├── views.py                 # Vistas, consultas optimizadas y controladores
+│   ├── forms.py                 # Formularios y validaciones de datos
 │   └── urls.py                  # Rutas internas de la aplicación
 ├── config/                      # Configuración global del proyecto Django
-│   ├── settings.py              # Ajustes, base de datos y middleware
-│   ├── urls.py                  # Enrutador principal
+│   ├── settings.py              # Ajustes, base de datos, STORAGES, media y seguridad
+│   ├── urls.py                  # Enrutador principal y servicio de media
 │   └── wsgi.py                  # Punto de entrada WSGI
+├── media/                       # Archivos multimedia subidos por los usuarios (fotos de servicios)
 ├── .env.example                 # Plantilla de variables de entorno
-├── .gitignore                   # Archivos excluidos de Git
+├── .gitignore                   # Archivos excluidos del control de versiones
 ├── manage.py                    # Gestor de comandos de Django
-├── requirements.txt             # Librerías y dependencias del proyecto
+├── requirements.txt             # Librerías y dependencias (Django, Pillow, mysqlclient, etc.)
 └── README.md                    # Documentación del proyecto
 ```
 
@@ -156,4 +176,3 @@ SalonSpa/
 ## 📄 Licencia
 
 Este proyecto es de uso privado para **Green Harmony Spa**. Todos los derechos reservados.
-
