@@ -763,17 +763,41 @@ td.acciones form {
 }
 
 /* Búsqueda y filtros */
-.buscar,
+.buscar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+}
+
+.buscar form.buscar,
+form.buscar {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin: 0;
+    flex-wrap: nowrap;
+}
+
+.buscar form.buscar input.buscar-input,
+form.buscar input.buscar-input,
+input.buscar-input {
+    width: 15rem !important;
+    max-width: 100%;
+    margin: 0;
+}
+
+.buscar form.buscar .btn,
+form.buscar .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 .filtros {
     display: flex;
     flex-wrap: wrap;
     gap: .6rem;
     align-items: flex-end
-}
-
-.buscar-input {
-    width: 15rem;
-    max-width: 100%;
 }
 
 .filtros {
@@ -1115,12 +1139,10 @@ input[type="file"]::file-selector-button:hover {
 .slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        140deg,
-        rgba(19, 39, 33, 0.88) 0%,
-        rgba(27, 52, 46, 0.74) 50%,
-        rgba(15, 31, 26, 0.92) 100%
-    );
+    background: linear-gradient(140deg,
+            rgba(19, 39, 33, 0.88) 0%,
+            rgba(27, 52, 46, 0.74) 50%,
+            rgba(15, 31, 26, 0.92) 100%);
     z-index: 2;
     pointer-events: none;
 }
@@ -1166,16 +1188,20 @@ input[type="file"]::file-selector-button:hover {
         opacity: 0;
         transform: scale(1);
     }
+
     6% {
         opacity: 1;
     }
+
     33.33% {
         opacity: 1;
     }
+
     39.33% {
         opacity: 0;
         transform: scale(1.08);
     }
+
     100% {
         opacity: 0;
         transform: scale(1);
@@ -1379,7 +1405,7 @@ dialog .acciones-form {
         gap: .9rem;
     }
 
-    .cabecera > div:first-child {
+    .cabecera>div:first-child {
         width: 100%;
     }
 
@@ -1393,15 +1419,25 @@ dialog .acciones-form {
     .buscar form.buscar {
         width: 100%;
         display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
         gap: .5rem;
     }
 
+    .buscar form.buscar input.buscar-input,
     .buscar-input {
         flex: 1;
+        width: 100% !important;
+        min-width: 0;
+    }
+
+    .buscar form.buscar .btn {
+        flex-shrink: 0;
         width: auto;
     }
 
-    .buscar > a.btn {
+    .buscar>a.btn {
         width: 100%;
         justify-content: center;
         text-align: center;
@@ -1520,11 +1556,22 @@ dialog .acciones-form {
     }
 
     .buscar form.buscar {
-        flex-wrap: wrap;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .buscar form.buscar input.buscar-input {
+        flex: 1;
+        min-width: 0;
     }
 
     .buscar form.buscar .btn {
-        flex: 1;
+        flex: 0 0 auto;
+        width: auto;
+        padding: .5rem .75rem;
     }
 
     .lista li {
